@@ -1,9 +1,9 @@
 #include <cstdio>
 #include <iostream>
-#include "trie_automata.h"
+#include "ac.h"
 
 using namespace std;
-using namespace trie_automata;
+using namespace ac;
 
 /**
  * ##ac_build
@@ -16,16 +16,28 @@ int main(int argc, const char** argv) {
         printf("usage: %s ac.bin < ordered_dict_file\n", argv[0]);
         return 0;
     }
-    TextDict text_dict;
-    /// read text dict
+    std::vector<std::string> keys;
+    std::vector<unsigned int> values;
+
     for (string line; getline(cin, line); ) {
-        text_dict.AddLine(line);
+
+        size_t table_pos = line.find('\t');
+        if (table_pos != std::string::npos) {
+            keys.push_back(line.substr(0, table_pos));
+            values.push_back(atoi(line.c_str() + table_pos + 1));
+        } else {
+            keys.push_back(std::move(line));
+            values.push_back(line.size());
+        }
     }
-    printf("%lu\n", text_dict.size());
+    //printf("%lu\n", text_dict.size());
+
+    AC_Automata aca;
+    if (build(keys, values, &aca)) {
+        printf("%d\n", aca.size());
+    }
 
     /// build trie
-    std::shared_ptr<std::vector<ACNode>> trie = TrieBuilder<ACNode>().Build(text_dict);
-    FILE* pf = fopen(argv[1], "wb");
-    save_trie(*trie, pf);
+    save(aca, argv[1]);
     return 0;
 }
