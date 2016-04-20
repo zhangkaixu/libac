@@ -748,22 +748,6 @@ bool build(const std::vector<std::string>& keys, const std::vector<value_t>& val
     TrieBuilder<ACNode>(a).Build(text_dict);
 }
 
-state_t read(const AC_Automata& aca, const state_t old_state, const key_t label)
-{
-    std::vector<ACNode>& array_ = *(std::vector<ACNode>*)(&aca);
-    auto cur = old_state;
-    while (true) {
-        auto next = cur ^ array_[cur].offset() ^ label;
-        if (next >= array_.size()) {
-            printf("size!!!\n");
-        }
-        if (array_[next].label() == label) {
-            return next;
-        }
-        if (cur == ROOT_INDEX) return ROOT_INDEX;
-        cur = array_[cur].fail();
-    }
-}
 
 void save(const AC_Automata& aca, const char* filename) {
     std::vector<ACNode>& tree = *(std::vector<ACNode>*)(&aca);
@@ -773,7 +757,54 @@ void save(const AC_Automata& aca, const char* filename) {
         fwrite(&tree[0], sizeof(ACNode), tree.size(), pf);
     }
     fclose(pf);
+}
 
+void load(const char* filename, AC_Automata* aca) {
+    std::vector<ACNode>& tree = *(std::vector<ACNode>*)(aca);
+    FILE* pf = fopen(filename, "rb");
+
+    rewind(pf);
+    fseek(pf, 0, SEEK_END);
+    size_t file_size = ftell(pf);
+    rewind(pf);
+    tree.clear();
+    size_t trie_size = file_size / sizeof(ACNode);
+    tree.resize(trie_size);
+    size_t rt = fread(&tree[0], sizeof(ACNode), trie_size, pf);
+    fclose(pf);
+    return;
+}
+
+state_t input(const AC_Automata& aca, const state_t index, const key_t label)
+{
+    std::vector<ACNode>& array_ = *(std::vector<ACNode>*)(&aca);
+    auto cur = index;
+    while (true) {
+        auto next = cur ^ array_[cur].offset() ^ label;
+        if (next >= array_.size()) {
+            //printf("size!!!\n");
+        } else if (array_[next].label() == label) {
+            return next;
+        } else if (cur == ROOT_INDEX) {
+            return ROOT_INDEX;
+        }
+        cur = array_[cur].fail();
+    }
+}
+
+void output(const AC_Automata& aca, const state_t index, std::vector<unsigned int>* matches) 
+{
+    std::vector<ACNode>& array_ = *(std::vector<ACNode>*)(&aca);
+    matches->clear();
+    auto cur = index;
+    while (true) {
+        if (cur == ROOT_INDEX) return;
+        if (array_[cur].has_leaf()) {
+            matches->push_back(
+                    array_[cur ^ array_[cur].offset()].value());
+        }
+        cur = array_[cur].fail();
+    }
 }
 
 }

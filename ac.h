@@ -17,19 +17,13 @@ const state_t ROOT = 0;
 
 bool build(const std::vector<std::string>&, const std::vector<value_t>&, AC_Automata*);
 
-state_t read(const AC_Automata&, const state_t, const key_t);
-
 void save(const AC_Automata&, const char* filename);
+void load(const char* filename, AC_Automata* aca);
 
-//state_t trans(const AC_Automata, const state_t, const key_t, std::vector<value_t>* values = NULL);
-//state_t trans(const TRIE_Automata, const state_t, const key_t, value_t* value);
 
-/// read a key and trans from state old to new
-//state_t ac_read(const AC_Automata&, const key_t, state_t);
+state_t input(const AC_Automata&, const state_t, const key_t);
+void output(const AC_Automata& aca, const state_t index, std::vector<value_t>* matches);
 
-/// get all suffix
-
-//void ac_get(const AC_Automata&, const state_t, std::vector<value_t>& values);
 }
 
 #endif

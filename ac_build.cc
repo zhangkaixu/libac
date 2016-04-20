@@ -20,14 +20,13 @@ int main(int argc, const char** argv) {
     std::vector<unsigned int> values;
 
     for (string line; getline(cin, line); ) {
-
         size_t table_pos = line.find('\t');
         if (table_pos != std::string::npos) {
             keys.push_back(line.substr(0, table_pos));
             values.push_back(atoi(line.c_str() + table_pos + 1));
         } else {
             keys.push_back(std::move(line));
-            values.push_back(line.size());
+            values.push_back(values.size());
         }
     }
     //printf("%lu\n", text_dict.size());

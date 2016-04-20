@@ -31,3 +31,5 @@
 *.swp
 d
 ac_build
+ac
+ac_count
