@@ -8,12 +8,11 @@ namespace ac {
 typedef unsigned char key_t;
 typedef unsigned int value_t;
 
-typedef std::vector<unsigned int> AC_Automata;
-typedef std::vector<unsigned long> TRIE_Automata;
+typedef std::vector<unsigned long> AC_Automata;
+typedef std::vector<unsigned int> TRIE_Automata;
+
 typedef unsigned int state_t;
-
 const state_t ROOT = 0;
-
 
 bool build(const std::vector<std::string>&, const std::vector<value_t>&, AC_Automata*);
 

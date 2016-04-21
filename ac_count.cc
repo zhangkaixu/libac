@@ -18,6 +18,7 @@ int main(int argc, const char** argv) {
     AC_Automata aca;
     load(argv[1], &aca);
 
+    std::vector<unsigned int> count;
     std::vector<unsigned int> matches;
 
     for (string line; getline(cin, line); ) {
@@ -26,11 +27,17 @@ int main(int argc, const char** argv) {
             unsigned char c = line[i];
             pos = input(aca, pos, c);
             output(aca, pos, &matches);
-            printf(">>\n");
             for (auto j = 0; j < matches.size(); j++) {
-                printf(">>%u\n", matches[j]);
+                while (matches[j] >= count.size()) {
+                    count.push_back(0);
+                }
+                count[matches[j]]++;
             }
         }
+    }
+
+    for (auto i = 0; i < count.size(); i++) {
+        printf("%u\n", count[i]);
     }
     return 0;
 }
