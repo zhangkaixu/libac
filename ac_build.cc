@@ -26,14 +26,14 @@ int main(int argc, const char** argv) {
             values.push_back(atoi(line.c_str() + table_pos + 1));
         } else {
             keys.push_back(std::move(line));
-            values.push_back(values.size());
+            values.push_back((unsigned int)values.size());
         }
     }
     //printf("%lu\n", text_dict.size());
 
     AC_Automata aca;
     if (build(keys, values, &aca)) {
-        printf("%d\n", aca.size());
+        printf("%lu\n", aca.size());
     }
 
     /// build trie

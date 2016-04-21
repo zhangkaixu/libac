@@ -94,12 +94,12 @@ public:
             values_.push_back(atoi(line.c_str() + table_pos + 1));
         } else {
             keys_.push_back(line);
-            values_.push_back(line.size());
+            values_.push_back((unsigned int)line.size());
         }
     }
 
     bool Check() const {
-        for (int i = 1; i < keys_.size(); i++) {
+        for (size_t i = 1; i < keys_.size(); i++) {
             if (keys_[i - 1] >= keys_[i]) {
                 return false;
             }
@@ -142,7 +142,7 @@ public:
 
 private:
     std::vector<std::string> keys_;
-    std::vector<int> values_;
+    std::vector<unsigned int> values_;
 
 };
 
@@ -366,8 +366,8 @@ public:
 
     void _report() {
         size_t free = 0;
-        for (size_t i = 0; i< free_info_.size(); i++) {
-            printf("freelist %lu %u\n", i, IsFree(i));
+        for (unsigned int i = 0; i< free_info_.size(); i++) {
+            printf("freelist %u %u\n", i, IsFree(i));
             if (IsFree(i)) {
                 free++;
             }
@@ -411,7 +411,7 @@ private:
         free_info_[next].prev = prev;
         if (head_ == idx) { /// 使用了head
             if (head_ == next) { /// head本来是唯一free的节点
-                head_ = free_info_.size();
+                head_ = (unsigned int)free_info_.size();
             } else { /// head右移
                 head_ = next;
             }
@@ -464,26 +464,26 @@ private:
         bool was_full = IsFull();
         size_t old_size = free_info_.size();
         for (size_t i = 0; i < old_size; i++) {
-            free_info_.push_back(FreeInfo(free_info_.size() - 1, free_info_.size() + 1));
+            free_info_.push_back(FreeInfo((unsigned int)free_info_.size() - 1, (unsigned int)free_info_.size() + 1));
         }
 
         if (was_full) { 
-            head_ = old_size;
+            head_ = (unsigned int)old_size;
         } else {
-            size_t old_tail = free_info_[head_].prev;
-            free_info_[old_tail].next = old_size;
+            unsigned int old_tail = free_info_[head_].prev;
+            free_info_[old_tail].next = (unsigned int)old_size;
             free_info_[old_size].prev = old_tail;
         }
 
-        free_info_[head_].prev = free_info_.size() - 1;
+        free_info_[head_].prev = (unsigned int)free_info_.size() - 1;
         free_info_.back().next = head_;
     }
     struct FreeInfo {
-        unsigned int prev;
-        unsigned int next;
-        bool used;
         FreeInfo(unsigned int p, unsigned int n) : 
             used(false), prev(p), next(n) {}
+        bool used;
+        unsigned int prev;
+        unsigned int next;
     };
     bool IsFull() const {
         return head_ == free_info_.size();
@@ -666,11 +666,11 @@ void TrieBuilder<Node>::DFS(TextDict& text_dict,
         }
 
         /// 分配TRIE树空间，填充内容
-        unsigned int offset = get_offset(state->node_pos, keys);
+        unsigned int offset = get_offset((unsigned int)state->node_pos, keys);
 
         /// 将非叶子节点的每个孩子也放入队列
         for (size_t i = 0; i < keys.size(); i++) {
-            if (!get_child(state->node_pos, offset,
+            if (!get_child((unsigned int)state->node_pos, offset,
                     keys[i], begins[i], text_dict)) {
                 continue;
             }
@@ -739,13 +739,14 @@ bool build(const std::vector<std::string>& keys, const std::vector<value_t>& val
     if (keys.size() != values.size()) {
         return false;
     }
-    for (auto i = 0; i < keys.size(); i++) {
+    for (size_t i = 0; i < keys.size(); i++) {
         text_dict.AddKeyValue(keys[i], values[i]);
     }
 
     /// build trie
     std::vector<ACNode>& a = *((std::vector<ACNode>*)aca);
     TrieBuilder<ACNode>(a).Build(text_dict);
+    return true;
 }
 
 
@@ -771,6 +772,9 @@ void load(const char* filename, AC_Automata* aca) {
     size_t trie_size = file_size / sizeof(ACNode);
     tree.resize(trie_size);
     size_t rt = fread(&tree[0], sizeof(ACNode), trie_size, pf);
+    if (rt == 0) {
+        fprintf(stderr, "no data is loaded\n");
+    }
     fclose(pf);
     return;
 }

@@ -27,7 +27,7 @@ int main(int argc, const char** argv) {
             unsigned char c = line[i];
             pos = input(aca, pos, c);
             output(aca, pos, &matches);
-            for (auto j = 0; j < matches.size(); j++) {
+            for (size_t j = 0; j < matches.size(); j++) {
                 while (matches[j] >= count.size()) {
                     count.push_back(0);
                 }
@@ -36,7 +36,7 @@ int main(int argc, const char** argv) {
         }
     }
 
-    for (auto i = 0; i < count.size(); i++) {
+    for (size_t i = 0; i < count.size(); i++) {
         printf("%u\n", count[i]);
     }
     return 0;
